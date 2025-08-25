@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -15,22 +16,55 @@ class UserController extends Controller
         $query = User::withCount(['posts', 'followers', 'following']);
 
         if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('username', 'like', '%' . $request->search . '%')
-                ->orWhere('email', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('username', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
         }
 
         $users = $query->latest()->paginate(20);
 
-        return view('admin.users.index', compact('users'));
+        // Stats for the header
+        $totalUsers = User::count();
+        $activeUsers = User::where('created_at', '>', now()->subMonth())->count();
+        $adminCount = Admin::count();
+        $privateAccounts = User::where('is_private', true)->count();
+
+        return view('admin.users.index', compact(
+            'users',
+            'totalUsers',
+            'activeUsers',
+            'adminCount',
+            'privateAccounts'
+        ));
     }
 
     public function show(User $user)
     {
         $user->loadCount(['posts', 'followers', 'following']);
-        $posts = $user->posts()->latest()->paginate(10);
 
-        return view('admin.users.show', compact('user', 'posts'));
+        // Load posts with likes and comments count
+        $posts = $user->posts()
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->paginate(10);
+
+        // Calculate additional statistics
+        $totalLikes = $user->posts()->withCount('likes')->get()->sum('likes_count');
+        $totalComments = $user->posts()->withCount('comments')->get()->sum('comments_count');
+
+        // Calculate average engagement (likes + comments per post)
+        $avgEngagement = $user->posts_count > 0 ? ($totalLikes + $totalComments) / $user->posts_count : 0;
+
+        return view('admin.users.show', compact(
+            'user',
+            'posts',
+            'totalLikes',
+            'totalComments',
+            'avgEngagement'
+        ));
     }
 
     public function edit(User $user)

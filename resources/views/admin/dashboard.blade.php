@@ -89,7 +89,7 @@
                                 class="w-10 h-10 rounded-full">
                             <div>
                                 <h4 class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">@{{ $user - > username }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->username }}</p>
                             </div>
                         </div>
                     </div>

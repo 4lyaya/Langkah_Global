@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/{user:username}/following', [ProfileController::class, 'following'])->name('profile.following');
     Route::get('/settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/users/{user}/follow', [ProfileController::class, 'follow'])->name('users.follow');
     Route::post('/users/{user}/unfollow', [ProfileController::class, 'unfollow'])->name('users.unfollow');
 
@@ -64,3 +65,7 @@ Route::middleware('auth')->group(function () {
 
 // Admin Routes
 require __DIR__ . '/admin.php';
+
+Route::get('/welcome', function () {
+    return view('welcome');
+})->name('welcome');
