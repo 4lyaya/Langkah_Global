@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "Jika menggunakan LangkahGlobal dalam penelitian, mohon sitasi berikut:"
+title: "LangkahGlobal: Laravel + Tailwind Blog Platform"
+authors:
+    - family-names: "Wijaya"
+      given-names: "Akmal Raditya Wijaya"
+      email: "akmal.raditya.wijaya@gmail.com"
+version: "1.0.0"
+date-released: "2025-08-26"
+url: "https://github.com/4lyaya/Langkah_Global.git"
